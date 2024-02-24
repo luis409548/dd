@@ -18,25 +18,18 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
         return;
     }
 
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('filename', filenameInput);
+    // Validate file type
+    const validTypes = ['image/gif', 'image/png', 'image/jpeg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        feedbackDiv.innerHTML = 'Invalid file type. Only GIF, PNG, JPG, and WEBP are allowed.';
+        return;
+    }
 
-    fetch('/upload', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const url = `http://yourdomain.com/cdn/${filenameInput}`;
-            feedbackDiv.innerHTML = `Upload successful! <a href="${url}" target="_blank">Click here</a> to view your image. <button onclick="navigator.clipboard.writeText('${url}')">Copy URL</button>`;
-        } else {
-            feedbackDiv.innerHTML = 'Upload failed. Please try again.';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        feedbackDiv.innerHTML = 'Upload failed. Please try again.';
-    });
+    // Simulate an upload and generate a mock URL
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64Image = reader.result;
+        feedbackDiv.innerHTML = `Upload successful! Here's your image: <img src="${base64Image}" alt="Uploaded Image" style="max-width: 100%; height: auto;">`;
+    };
+    reader.readAsDataURL(file);
 });
